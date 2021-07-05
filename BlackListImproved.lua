@@ -81,14 +81,14 @@ function bli_main_frame:ShowBlackList()
 	
 	local bli_button_add = CreateFrame("Button", "bliAddButton", bli_main_frame, "UIPanelButtonTemplate")
 	bli_button_add:SetSize(80, 25)
-	bli_button_add:SetPoint("TOPLEFT", 10, -23)
+	bli_button_add:SetPoint("TOPRIGHT", -10, -23)
 	bli_button_add:SetText("Add player")
 	bli_button_add:SetScript("OnClick", function() bli_main_frame:addDescription(nil, nil) end)
 	bli_main_frame.bli_button_add = bli_button_add
 
 	local bli_editbox_search = CreateFrame("EditBox", "bliSearchEditBox", bli_main_frame, "InputBoxTemplate")
 	bli_editbox_search:SetSize(120, 1)
-	bli_editbox_search:SetPoint("TOPRIGHT", -10, -36)
+	bli_editbox_search:SetPoint("TOPLEFT", 60, -36)
 	bli_editbox_search:SetScript("OnTextChanged", function() bli_main_frame:filling_list_players(bli_editbox_search:GetText()) end)
 	bli_main_frame.bli_editbox_search = bli_editbox_search
 
@@ -96,14 +96,8 @@ function bli_main_frame:ShowBlackList()
 	label_main:SetPoint("TOP", 0, -5)
 	label_main:SetText("Black List Improved v"..addonVersion)
 
-	-- local bli_line = bli_main_frame:CreateLine()
-	-- bli_line:SetColorTexture(.1, 0, .1, 1)
-	-- bli_line:SetStartPoint("TOPLEFT", 10, -20)
-	-- bli_line:SetEndPoint("TOPRIGHT", -10, -20)
-	-- bli_line:SetThickness(2)
-
 	local label_search = bli_main_frame:CreateFontString(bli_main_frame, "OVERLAY", "GameTooltipText")
-	label_search:SetPoint("TOPLEFT", 100, -28)
+	label_search:SetPoint("TOPLEFT", 10, -30)
 	label_search:SetText("Search:")
 
 	bli_main_frame:filling_list_players(nil)
@@ -131,6 +125,7 @@ function bli_main_frame:filling_list_players(str_find)
 				local bli_button = CreateFrame("Button", nil, bli_main_frame.scrollframe)
 				bli_button:SetSize(150, 15)
 				bli_button:SetNormalFontObject("GameFontNormal")
+				bli_button:SetHighlightFontObject("GameFontHighlight")
 				bli_button:SetText(key)
 				bli_button:SetScript("OnEnter", function() bli_main_frame:getDescriptionTooltip(bli_button, value.reason) end)
 				bli_button:SetScript("OnClick", function() bli_main_frame:editDescription(bli_button, value) end)
@@ -186,15 +181,16 @@ function bli_main_frame:editDescription(bli_button, value)
 	bli_main_frame:addDescription(bli_button, value)
 end
 
--- Добавлю игрока и описание причны
+-- Добавлю игрока и причину
 function bli_main_frame:addDescription(bli_button, value)
+
 	if bli_main_frame.frameAddDescription ~= nil then
 		bli_main_frame.frameAddDescription:Hide()
 		bli_main_frame.frameAddDescription = nil
 	end
 
 	local frameAddDescription = CreateFrame("Frame", nil, bli_main_frame)
-	frameAddDescription:SetSize(250, 210)
+	frameAddDescription:SetSize(250, 220)
 	frameAddDescription:SetPoint("TOPRIGHT", bli_main_frame, "TOPRIGHT", 275, 0)
 
 	local texture = frameAddDescription:CreateTexture()
@@ -209,15 +205,23 @@ function bli_main_frame:addDescription(bli_button, value)
 	bli_button_close:SetPoint("TOPRIGHT", 0, 0)
 	bli_button_close:SetScript("OnClick", function() frameAddDescription:Hide() end)
 
+	local label_editboxPlayer = frameAddDescription:CreateFontString(frameAddDescription, "OVERLAY", "GameTooltipText")
+	label_editboxPlayer:SetPoint("TOPLEFT", 15, -30)
+	label_editboxPlayer:SetText("Player:")
+
 	local editboxPlayer = CreateFrame("EditBox", "bliAddPlayerEditBox", frameAddDescription, "InputBoxTemplate")
-	editboxPlayer:SetSize(180, 1)
-	editboxPlayer:SetPoint("LEFT", frameAddDescription, "TOPLEFT", 15, -40)
+	editboxPlayer:SetSize(150, 1)
+	editboxPlayer:SetPoint("LEFT", frameAddDescription, "TOPLEFT", 65, -35)
 	editboxPlayer:SetFontObject(ChatFontNormal)
 	editboxPlayer:SetScript("OnEscapePressed", function() frameAddDescription:Hide() end)
 
+	local label_editboxDescription = frameAddDescription:CreateFontString(frameAddDescription, "OVERLAY", "GameTooltipText")
+	label_editboxDescription:SetPoint("TOPLEFT", 15, -55)
+	label_editboxDescription:SetText("Description:")
+
 	local scrollFrameDescription = CreateFrame("ScrollFrame", nil, frameAddDescription, "UIPanelScrollFrameTemplate")
 	scrollFrameDescription:SetSize(200, 100)
-	scrollFrameDescription:SetPoint("LEFT", frameAddDescription, "TOPLEFT", 15, -110)
+	scrollFrameDescription:SetPoint("LEFT", frameAddDescription, "TOPLEFT", 15, -120)
 
 	local edit_texture = scrollFrameDescription:CreateTexture()
 	edit_texture:SetAllPoints()
@@ -232,10 +236,13 @@ function bli_main_frame:addDescription(bli_button, value)
 	editboxDescription:SetScript("OnEscapePressed", function() frameAddDescription:Hide() end)
 
 	local checkbuttonBlockChannels = CreateFrame("CheckButton", "bliBlockChannelsCheckButton", frameAddDescription, "ChatConfigCheckButtonTemplate")
-	checkbuttonBlockChannels:SetPoint("BOTTOMLEFT", frameAddDescription, 0, 23)
-	bliBlockChannelsCheckButtonText:SetText("Block channels for player")
+	checkbuttonBlockChannels:SetPoint("BOTTOMLEFT", frameAddDescription, 13, 25)
 	checkbuttonBlockChannels.tooltip = "Block channels for player"
-	_G[checkbuttonBlockChannels:GetName().."Text"]:SetText(checkbuttonBlockChannels.tooltip)
+	--_G[checkbuttonBlockChannels:GetName().."Text"]:SetText(checkbuttonBlockChannels.tooltip)
+
+	local label_BlockChannels = frameAddDescription:CreateFontString(frameAddDescription, "OVERLAY", "GameTooltipText")
+	label_BlockChannels:SetPoint("BOTTOMLEFT", 38, 30)
+	label_BlockChannels:SetText("Block channels for player")
 
 	local player = GetUnitName("target")
 
