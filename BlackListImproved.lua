@@ -20,8 +20,8 @@ local function WowPrint(msg, numberChat)
 end
 
 function bli_main_frame:ShowBlackList()
-
 	kids = {bli_main_frame:GetChildren()}
+
 	for _, child in ipairs(kids) do
 		child:Hide()
 	end
@@ -47,8 +47,14 @@ function bli_main_frame:ShowBlackList()
 
 	--scrollframe
 	local scrollframe = CreateFrame("ScrollFrame", "bliScrollFrame", bli_main_frame)
-	scrollframe:SetPoint("TOPLEFT", 10, -10)
+	scrollframe:SetPoint("TOPLEFT", 10, -50)
 	scrollframe:SetPoint("BOTTOMRIGHT", -10, 10)
+
+	local scrollframe_texture = scrollframe:CreateTexture()
+	scrollframe_texture:SetAllPoints()
+	scrollframe_texture:SetColorTexture(.2, .1, .1, 1)
+	scrollframe.background = scrollframe_texture
+
 	bli_main_frame.scrollframe = scrollframe
 
 	--scrollbar
@@ -75,16 +81,30 @@ function bli_main_frame:ShowBlackList()
 	
 	local bli_button_add = CreateFrame("Button", "bliAddButton", bli_main_frame, "UIPanelButtonTemplate")
 	bli_button_add:SetSize(80, 25)
-	bli_button_add:SetPoint("TOPLEFT")
-	bli_button_add:SetText("add player")
+	bli_button_add:SetPoint("TOPLEFT", 10, -23)
+	bli_button_add:SetText("Add player")
 	bli_button_add:SetScript("OnClick", function() bli_main_frame:addDescription(nil, nil) end)
 	bli_main_frame.bli_button_add = bli_button_add
 
-	local bli_editbox_find = CreateFrame("EditBox", "bliFindEditBox", bli_main_frame, "InputBoxTemplate")
-	bli_editbox_find:SetSize(150, 1)
-	bli_editbox_find:SetPoint("TOPLEFT", 85, -13)
-	bli_editbox_find:SetScript("OnTextChanged", function() bli_main_frame:filling_list_players(bli_editbox_find:GetText()) end)
-	bli_main_frame.bli_editbox_find = bli_editbox_find
+	local bli_editbox_search = CreateFrame("EditBox", "bliSearchEditBox", bli_main_frame, "InputBoxTemplate")
+	bli_editbox_search:SetSize(120, 1)
+	bli_editbox_search:SetPoint("TOPRIGHT", -10, -36)
+	bli_editbox_search:SetScript("OnTextChanged", function() bli_main_frame:filling_list_players(bli_editbox_search:GetText()) end)
+	bli_main_frame.bli_editbox_search = bli_editbox_search
+
+	local label_main = bli_main_frame:CreateFontString(bli_main_frame, "OVERLAY", "GameTooltipText")
+	label_main:SetPoint("TOP", 0, -5)
+	label_main:SetText("Black List Improved v"..addonVersion)
+
+	-- local bli_line = bli_main_frame:CreateLine()
+	-- bli_line:SetColorTexture(.1, 0, .1, 1)
+	-- bli_line:SetStartPoint("TOPLEFT", 10, -20)
+	-- bli_line:SetEndPoint("TOPRIGHT", -10, -20)
+	-- bli_line:SetThickness(2)
+
+	local label_search = bli_main_frame:CreateFontString(bli_main_frame, "OVERLAY", "GameTooltipText")
+	label_search:SetPoint("TOPLEFT", 100, -28)
+	label_search:SetText("Search:")
 
 	bli_main_frame:filling_list_players(nil)
 	bli_main_frame:Show()
@@ -109,14 +129,14 @@ function bli_main_frame:filling_list_players(str_find)
 			if string.find(key, str_find) ~= nil then
 				i = i + 1
 				local bli_button = CreateFrame("Button", nil, bli_main_frame.scrollframe)
-				bli_button:SetSize(100, 15)
+				bli_button:SetSize(150, 15)
 				bli_button:SetNormalFontObject("GameFontNormal")
 				bli_button:SetText(key)
 				bli_button:SetScript("OnEnter", function() bli_main_frame:getDescriptionTooltip(bli_button, value.reason) end)
 				bli_button:SetScript("OnClick", function() bli_main_frame:editDescription(bli_button, value) end)
 
 				if i == 1 then
-		    	bli_button:SetPoint("TOPLEFT", bli_main_frame.scrollframe, 0, -20)
+		    	bli_button:SetPoint("TOPLEFT", bli_main_frame.scrollframe, 2, -1)
 		  	else
 		    	bli_button:SetPoint("TOP", bli_buttons[i-1], "BOTTOM")
 		  	end
@@ -128,18 +148,25 @@ function bli_main_frame:filling_list_players(str_find)
 		for key, value in pairs(black_list_improved) do
 			i = i + 1
 		  local bli_button = CreateFrame("Button", nil, bli_main_frame.scrollframe)
-		  bli_button:SetSize(100, 15)
+		  bli_button:SetSize(150, 15)
 		  bli_button:SetNormalFontObject("GameFontNormal")
+		  bli_button:SetHighlightFontObject("GameFontHighlight")
 		  bli_button:SetText(key)
 		  bli_button:SetScript("OnEnter", function() bli_main_frame:getDescriptionTooltip(bli_button, value.reason) end)
 		  bli_button:SetScript("OnClick", function() bli_main_frame:editDescription(bli_button, value) end)
 		   
 		  if i == 1 then
-		     bli_button:SetPoint("TOPLEFT", bli_main_frame.scrollframe, 0, -20)
+		  	bli_button:SetPoint("TOPLEFT", bli_main_frame.scrollframe, 2, -1)
 		  else
-		     bli_button:SetPoint("TOP", bli_buttons[i-1], "BOTTOM")
+		    bli_button:SetPoint("TOP", bli_buttons[i-1], "BOTTOM")
 		  end
-		   
+
+		 --  local bli_separator_line = bli_main_frame.scrollframe:CreateLine()
+			-- bli_separator_line:SetColorTexture(.1, 0, .1, 1)
+			-- bli_separator_line:SetStartPoint("BOTTOMLEFT", bli_button, 0, 0)
+			-- bli_separator_line:SetEndPoint("BOTTOMRIGHT", bli_button, 0, 0)
+			-- bli_separator_line:SetThickness(2)
+ 
 		  bli_buttons[i] = bli_button
 		end
 	end
@@ -238,7 +265,7 @@ function bli_main_frame:addDescription(bli_button, value)
 	buttonDeletePlayer:SetText("Delete")
 	buttonDeletePlayer:SetScript("OnClick", function() bli_main_frame:deletePlayer(editboxPlayer:GetText()) end)
 
-	bli_main_frame:filling_list_players(bli_main_frame.bli_editbox_find:GetText())
+	bli_main_frame:filling_list_players(bli_main_frame.bli_editbox_search:GetText())
 end --addDescription
 
 function bli_main_frame:saveDescription(player, description, block_channels)
@@ -248,13 +275,13 @@ function bli_main_frame:saveDescription(player, description, block_channels)
 	black_list_improved[player].date = date("%m/%d/%y %H:%M")
 	black_list_improved[player].block_channels = block_channels
 	bli_main_frame.frameAddDescription:Hide()
-	bli_main_frame:filling_list_players(bli_main_frame.bli_editbox_find:GetText())
+	bli_main_frame:filling_list_players(bli_main_frame.bli_editbox_search:GetText())
 end
 
 function bli_main_frame:deletePlayer(player)
 	black_list_improved[player] = nil
 	bli_main_frame.frameAddDescription:Hide()
-	bli_main_frame:filling_list_players(bli_main_frame.bli_editbox_find:GetText())
+	bli_main_frame:filling_list_players(bli_main_frame.bli_editbox_search:GetText())
 end
 
 function bli_main_frame:checkPlayersInRaid(num_members)
@@ -262,7 +289,7 @@ function bli_main_frame:checkPlayersInRaid(num_members)
 		name = GetRaidRosterInfo(i)
 
 		if black_list_improved[name] ~= nil then
-			print("|cFFFF1C1C "..name.." <-- ПЕДЕРАСТ ОПОЗНАН! Причина:")
+			print("|cFFFF1C1C "..name.." <-- is on the ignore list! Reason:")
 			print("|cFFFF1C1C "..black_list_improved[name].reason)
 		end
 	end
