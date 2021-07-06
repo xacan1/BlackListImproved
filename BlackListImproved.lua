@@ -1,11 +1,13 @@
 --author Hasan Smirnov 2021
 --black_list_improved = {["player1"] = {reason = "description1", date = "date", block_channels = true}, ["player2"] = {reason = "description2", date = "date", block_channels = true}}
-SLASH_BLACKLISTIMPROVED1, SLASH_BLACKLISTIMPROVED2 = "/bli", "/blacklistimproved"
 local addonName = "BlackListImproved"
+SLASH_BLACKLISTIMPROVED1, SLASH_BLACKLISTIMPROVED2 = "/bli", "/blacklistimproved"
 local addonVersion = "1.0"
 local bli_buttons = {}
 local bli_main_frame = CreateFrame("Frame", "bliFrame", UIParent)
 local bli_tooltip = CreateFrame("GameTooltip", "bliDescriptionTooltip", bli_main_frame, "GameTooltipTemplate")
+local label_main = bli_main_frame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+local label_search = bli_main_frame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
 local last_num_raid_members -- хранит текущее количество игроков в вашем рейде/группе или 0 если не в группе
 
 function bli_main_frame:ShowBlackList()
@@ -14,6 +16,12 @@ function bli_main_frame:ShowBlackList()
 	for _, child in ipairs(kids) do
 		child:Hide()
 	end
+	
+	label_main:SetPoint("TOP", 0, -5)
+	label_main:SetText("Black List Improved v"..addonVersion)
+
+	label_search:SetPoint("TOPLEFT", 10, -30)
+	label_search:SetText("Search:")
 
 	--Show my parent Frame
 	bli_main_frame:SetMovable(true)
@@ -80,14 +88,6 @@ function bli_main_frame:ShowBlackList()
 	bli_editbox_search:SetPoint("TOPLEFT", 65, -36)
 	bli_editbox_search:SetScript("OnTextChanged", function() bli_main_frame:filling_list_players(bli_editbox_search:GetText()) end)
 	bli_main_frame.bli_editbox_search = bli_editbox_search
-
-	local label_main = bli_main_frame:CreateFontString(bli_main_frame, "OVERLAY", "GameTooltipText")
-	label_main:SetPoint("TOP", 0, -5)
-	label_main:SetText("Black List Improved v"..addonVersion)
-
-	local label_search = bli_main_frame:CreateFontString(bli_main_frame, "OVERLAY", "GameTooltipText")
-	label_search:SetPoint("TOPLEFT", 10, -30)
-	label_search:SetText("Search:")
 
 	bli_main_frame:filling_list_players(nil)
 	bli_main_frame:Show()
