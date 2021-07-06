@@ -1,7 +1,7 @@
 ## Interface: 20501
 ## Title: BlackListImproved
 ## Author: Hasan Smirnov
-## Version: 0.9
+## Version: 1.0
 ## Notes: Black list with notes
 ## eMail: xacan-mail@mail.ru
 ## DefaultState: Enabled

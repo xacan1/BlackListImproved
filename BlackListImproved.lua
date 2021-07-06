@@ -2,7 +2,7 @@
 --black_list_improved = {["player1"] = {reason = "description1", date = "date", block_channels = true}, ["player2"] = {reason = "description2", date = "date", block_channels = true}}
 local addonName = "BlackListImproved"
 SLASH_BLACKLISTIMPROVED1, SLASH_BLACKLISTIMPROVED2 = "/bli", "/blacklistimproved"
-local addonVersion = "0.9"
+local addonVersion = "1.0"
 local bli_buttons = {}
 local bli_main_frame = CreateFrame("Frame", "bliFrame", UIParent)
 local bli_tooltip = CreateFrame("GameTooltip", "bliDescriptionTooltip", bli_main_frame, "GameTooltipTemplate")
@@ -332,7 +332,7 @@ end
 
 local function filterChat(self, event, msg, author, ...)
 	--local args = {...}
-	player = string.match(author, "(%S+)-")
+	local player = string.match(author, "(%S+)-")
 
 	if black_list_improved[player] ~= nil and not black_list_improved[player].block_channels then
 		return false, "|cFFFA1C1C <IGNORED>"..msg, author, ...
