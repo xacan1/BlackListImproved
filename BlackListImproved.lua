@@ -1,7 +1,8 @@
 --author Hasan Smirnov 2021
 --black_list_improved = {["player1"] = {reason = "description1", date = "date", block_channels = true}, ["player2"] = {reason = "description2", date = "date", block_channels = true}}
-local addonName = "BlackListImproved"
+
 SLASH_BLACKLISTIMPROVED1, SLASH_BLACKLISTIMPROVED2 = "/bli", "/blacklistimproved"
+local addonName = "BlackListImproved"
 local addonVersion = "1.0"
 local bli_buttons = {}
 local bli_main_frame = CreateFrame("Frame", "bliFrame", UIParent)
@@ -16,7 +17,7 @@ function bli_main_frame:ShowBlackList()
 	for _, child in ipairs(kids) do
 		child:Hide()
 	end
-	
+
 	label_main:SetPoint("TOP", 0, -5)
 	label_main:SetText("Black List Improved v"..addonVersion)
 
