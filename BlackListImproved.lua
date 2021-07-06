@@ -6,6 +6,7 @@ local addonVersion = "0.9"
 local bli_buttons = {}
 local bli_main_frame = CreateFrame("Frame", "bliFrame", UIParent)
 local bli_tooltip = CreateFrame("GameTooltip", "bliDescriptionTooltip", bli_main_frame, "GameTooltipTemplate")
+local last_num_raid_members -- хранит текущее количество игроков в вашем рейде/группе или 0 если не в группе
 
 local function WowPrint(msg, numberChat)
   if numberChat == nil then
@@ -88,7 +89,7 @@ function bli_main_frame:ShowBlackList()
 
 	local bli_editbox_search = CreateFrame("EditBox", "bliSearchEditBox", bli_main_frame, "InputBoxTemplate")
 	bli_editbox_search:SetSize(120, 1)
-	bli_editbox_search:SetPoint("TOPLEFT", 60, -36)
+	bli_editbox_search:SetPoint("TOPLEFT", 65, -36)
 	bli_editbox_search:SetScript("OnTextChanged", function() bli_main_frame:filling_list_players(bli_editbox_search:GetText()) end)
 	bli_main_frame.bli_editbox_search = bli_editbox_search
 
@@ -306,8 +307,6 @@ end
 --по этому я отсеиваю хотя бы те события когда счетчик группы еще не увеличился на 1
 --все равно пока что вызываются два события вместо одного...
 function bli_main_frame:OnEvent(event, arg1)
-	local i = 1
-
 	if event == "ADDON_LOADED" and arg1 == "BlackListImproved" then
 		bli_main_frame:UnregisterEvent("ADDON_LOADED")
 
@@ -315,18 +314,21 @@ function bli_main_frame:OnEvent(event, arg1)
 			black_list_improved = {}
 		end
 	elseif event == "GROUP_ROSTER_UPDATE" then
-		local num_members = GetNumGroupMembers()
-
-		while i < num_members do
-			i = i + 1
-			if i == num_members then
-				bli_main_frame:checkPlayersInRaid(num_members)
-			end
+		local current_num_members = GetNumGroupMembers()
+		--print(last_num_raid_members, current_num_members)
+		
+		if last_num_raid_members < current_num_members then
+			--print("add player")
+			bli_main_frame:checkPlayersInRaid(current_num_members)
+			last_num_raid_members = current_num_members
+		else
+			last_num_raid_members = current_num_members
 		end
 	end
 end
 
 function BlackListImproved_OnLoad()
+	last_num_raid_members = GetNumGroupMembers()
 	bli_main_frame:Hide()
 	bli_main_frame:RegisterEvent("ADDON_LOADED")
 	bli_main_frame:RegisterEvent("GROUP_ROSTER_UPDATE")

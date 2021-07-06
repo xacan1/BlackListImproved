@@ -2,11 +2,11 @@
 ## Title: BlackListImproved
 ## Author: Hasan Smirnov
 ## Version: 0.9
-## Notes: Black list with notes
 ## eMail: xacan-mail@mail.ru
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
-## Notes-ruRU: Расширенный черный список с заметками
+## Notes: Black list with notes
+## Notes-ruRU: Расширенный черный список с заметками об игроках
 ## SavedVariables: black_list_improved
 
 BlackListImproved.lua
