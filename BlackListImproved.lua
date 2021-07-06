@@ -8,18 +8,6 @@ local bli_main_frame = CreateFrame("Frame", "bliFrame", UIParent)
 local bli_tooltip = CreateFrame("GameTooltip", "bliDescriptionTooltip", bli_main_frame, "GameTooltipTemplate")
 local last_num_raid_members -- хранит текущее количество игроков в вашем рейде/группе или 0 если не в группе
 
-local function WowPrint(msg, numberChat)
-  if numberChat == nil then
-    numberChat = 1
-  end
-  
-  if numberChat == 1 then
-    ChatFrame1:AddMessage(msg)
-  elseif numberChat == 2 then
-    ChatFrame2:AddMessage(msg)
-  end
-end
-
 function bli_main_frame:ShowBlackList()
 	kids = {bli_main_frame:GetChildren()}
 
@@ -306,8 +294,11 @@ end
 --GROUP_ROSTER_UPDATE вызывается столько раз, сколько [членов рейда]*2
 --по этому я отсеиваю хотя бы те события когда счетчик группы еще не увеличился на 1
 --все равно пока что вызываются два события вместо одного...
-function bli_main_frame:OnEvent(event, arg1)
-	if event == "ADDON_LOADED" and arg1 == "BlackListImproved" then
+function bli_main_frame:OnEvent(event, ...)
+	local args = {...}
+
+	if event == "ADDON_LOADED" and args[1] == "BlackListImproved" then
+		print("|cFFFF1C1C Addon "..addonName.." v"..addonVersion.." loaded")
 		bli_main_frame:UnregisterEvent("ADDON_LOADED")
 
 		if black_list_improved == nil then
@@ -327,14 +318,40 @@ function bli_main_frame:OnEvent(event, arg1)
 	end
 end
 
+local function bliPrint(msg, numberChat)
+  if numberChat == nil then
+    numberChat = 1
+  end
+  
+  if numberChat == 1 then
+    ChatFrame1:AddMessage(msg)
+  elseif numberChat == 2 then
+    ChatFrame2:AddMessage(msg)
+  end
+end
+
+local function filterChat(self, event, msg, author, ...)
+	--local args = {...}
+	player = string.match(author, "(%S+)-")
+
+	if black_list_improved[player] ~= nil and not black_list_improved[player].block_channels then
+		return false, "|cFFFA1C1C <IGNORED>"..msg, author, ...
+	elseif black_list_improved[player] ~= nil and black_list_improved[player].block_channels then
+		return true
+	end
+end
+
 function BlackListImproved_OnLoad()
 	last_num_raid_members = GetNumGroupMembers()
 	bli_main_frame:Hide()
 	bli_main_frame:RegisterEvent("ADDON_LOADED")
 	bli_main_frame:RegisterEvent("GROUP_ROSTER_UPDATE")
-	--bli_main_frame:RegisterEvent("CHAT_MSG_ADDON")
-	print("|cFFFF1C1C Addon "..addonName.." v"..addonVersion.." loaded")
 	bli_main_frame:SetScript("OnEvent", bli_main_frame.OnEvent)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", filterChat)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", filterChat)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", filterChat)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", filterChat)
+	ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", filterChat)
 end
 
 function SlashCmdList.BLACKLISTIMPROVED(msg, editbox)
