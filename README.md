@@ -1,4 +1,4 @@
 # BlackListImproved
-addon Black list for World of Warcraft
+addon Black list for World of Warcraft BC Classic
 
-v 0.9 test major functions
+v 1.0 Release!
